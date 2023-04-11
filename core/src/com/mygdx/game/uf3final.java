@@ -3,20 +3,23 @@ package com.mygdx.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.ArrayList;
 
 public class uf3final extends Game {
-	Pelota ball;
+	Pelota pelota;
 	Paddle paddle;
-	ArrayList<Rectangulos> blocks = new ArrayList<>();
+	ArrayList<Rectangulos> bloques = new ArrayList<>();
 	AssetManager manager;
 	SpriteBatch shape;
 	Texture background;
 	int puntuacion;
 	GameController gameController;
+	BitmapFont font;
 	uf3final(GameController gameController){
 		this.gameController=gameController;
 	}
@@ -31,7 +34,7 @@ public class uf3final extends Game {
 		manager.load("fondo-azul-oscuro.png", Texture.class);
 		manager.finishLoading();
 		paddle = new Paddle("nave_down.png",50, 15, 50, 5);
-		ball = new Pelota(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 20, 5, 5, paddle);
+		pelota = new Pelota(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 20, 5, 5, paddle);
 		shape= new SpriteBatch();
 		background = manager.get("fondo-azul-oscuro.png", Texture.class);
 		int blockWidth = 80;
@@ -41,37 +44,40 @@ public class uf3final extends Game {
 				int p =(int) (Math.random()*4);
 				switch (p){
 					case 0:
-						blocks.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectanguloazul.png"));
+						bloques.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectanguloazul.png"));
 						break;
 					case 1:
-						blocks.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectangulolila.png"));
+						bloques.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectangulolila.png"));
 						break;
 					case 2:
-						blocks.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectangulonegro.png"));
+						bloques.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectangulonegro.png"));
 						break;
 					case 3:
-						blocks.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectanguloverde.png"));
+						bloques.add(new Rectangulos(x, y, blockWidth, blockHeight,"rectanguloverde.png"));
 						break;
 				}
 			}
 		}
+		font = new BitmapFont();
+		font.setColor(Color.WHITE);
+		puntuacion = 0;
 	}
 
 	public void update() {
-		ball.update(Gdx.graphics.getDeltaTime());
+		pelota.update(Gdx.graphics.getDeltaTime());
 		paddle.update();
 
-		for(int x=0; x<blocks.size(); x++) {
-			if(blocks.get(x).checkBallColission(ball.circle)) {
-				ball.cambiarY();
+		for(int x = 0; x< bloques.size(); x++) {
+			if(bloques.get(x).checkBallColission(pelota.circle)) {
+				pelota.cambiarY();
 				puntuacion+=50;
-				blocks.remove(x);
+				bloques.remove(x);
 			}
-			if(ball.y<0){
+			if(pelota.y<0){
 				GameOverScreen game = new GameOverScreen(gameController,puntuacion);
 				gameController.setScreen(game);
 			}
-			if(blocks.size()==0){
+			if(bloques.size()==0){
 				WinScreen game = new WinScreen(gameController,puntuacion);
 				gameController.setScreen(game);
 			}
@@ -80,16 +86,19 @@ public class uf3final extends Game {
 
 
 	public void render () {
-		update();
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		shape.begin();
-		shape.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		ball.draw(shape);
-		paddle.draw(shape);
-		for (Rectangulos block: blocks) {
-			block.draw(shape);
-		}
-		shape.end();
+			update();
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			shape.begin();
+			shape.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			pelota.draw(shape);
+			paddle.draw(shape);
+			for (Rectangulos block: bloques) {
+				block.draw(shape);
+			}
+			// Dibujamos la puntuación
+			BitmapFont font = new BitmapFont();
+			font.draw(shape, "Puntuación: " + puntuacion, 10, Gdx.graphics.getHeight() - 10);
+			shape.end();
 	}
 
 

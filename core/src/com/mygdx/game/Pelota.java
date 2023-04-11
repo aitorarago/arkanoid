@@ -14,7 +14,6 @@ public class Pelota extends Actor{
     int radius;
     int xSpeed;
     int ySpeed;
-    Color color = Color.WHITE;
     Circle circle;
     Paddle paddle;
     Texture ballTexture;
